@@ -1,0 +1,3379 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Historic Book Reviews
+</title>
+  <meta charset="utf-8">
+  <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+  <style>
+
+    th {color: white; background-color: black; padding-top: 7px; padding-bottom: 7px;}
+    td {padding: 3px; }
+    table { width: 100%; border-collapse: collapse;}
+    table.dataframe { 
+      width: 80%;
+      margin-left: 50px;
+      margin-top: 25px; 
+    }
+    table.dataframe>thead>tr>th {
+      border-color: black; 
+      background: linear-gradient(#1B1B1B, black); 
+    }
+    table.term-groups {
+      margin-top: 25px; 
+      margin-bottom: 25px; 
+    }
+    table.term-groups>tbody>tr>th {
+      border-color: black;
+      background: linear-gradient(#1B1B1B, black); 
+      text-align: left;
+      padding: 6px;
+      width: 25%;
+    }
+
+    table.term-groups>tbody>tr>td {
+      border-color: black;
+      text-align: left;
+      padding: 6px;
+    } 
+
+    td, th {border: 1px solid black; font-size: 95%; text-align: center;
+    }
+    body {
+      font-family: 'Helvetica Neue', 'Arial', 'sans-serif';
+      color: rgba(34,34,34,.77);
+
+    }
+    
+    h1 {
+      font-family: 'Helvetica Neue', 'Arial', 'sans-serif';
+      font-weight: normal;
+      margin-top: 5px;
+      margin-bottom: 5px;
+      color: black;
+      font-variant: small-caps;
+    }
+    h2 {
+      font-family: 'Helvetica Neue', 'Arial', 'sans-serif';
+      font-weight: normal;
+      color: black;
+      margin-top: 5px;
+      margin-bottom: 5px;
+    }
+    h3, h4 {
+      
+      color: rgba(34,34,34,.77);
+      font-weight: normal;
+      margin-top: 5px;
+      margin-bottom: 5px;
+    }
+    h5 {
+        
+        font-weight: normal;
+        color: black;
+        margin-top: 5px;
+        margin-bottom: 5px;
+    }
+    p {
+      margin-top: 1px;
+      margin-bottom: 1px;
+    }
+    .youtube {
+      width: 100%;
+      height: 45vh;
+    }
+    .middle {
+      background: linear-gradient(#8D8B8B, #e6e6e6);
+
+    }
+    .table-wrapper {
+      overflow-y: scroll;
+      width: 70%;
+      height: 100%;
+      margin-left: 10px;
+      /*display: block;
+      */
+    }
+    .remark-slide-content {
+      padding-top: 80px;
+      padding-bottom: 80px;
+    }
+    .remark-slide-content h1 {
+        font-size: 45px;
+    }
+    .remark-slide-content h2 {
+        font-size: 32px;
+    }
+    .remark-slide-content h3 {
+        font-size: 28px;
+    }
+    .remark-slide-content h4,h5 {
+        font-size: 22px;
+    }
+    img.hist {
+      width:55%;
+    }
+    h2.performance, h4.performance {
+      text-align:center;
+      margin-bottom: 25px;
+    }
+    div.performance {
+      padding-bottom:15px;
+      padding-top:15px; 
+      background-position: right center;
+      background-repeat: no-repeat;
+      background-size: auto 100%;
+    
+    }
+    #stopwords {
+      background-image: url(figures/stopwords_cm.png); 
+    }
+    #stop_pro {
+      background-image: url(figures/stop_pro_cm.png);
+    }
+    #stop_pro_names {
+      background-image: url(figures/stop_pro_names_cm.png);
+    }
+    #sentiment_pos {
+      background-image: url(figures/sentiment_pos_cm.png); 
+    }
+    #sentiment_neg {
+      background-image: url(figures/sentiment_neg_cm.png); 
+    }
+    #sentiment_all {
+      background-image: url(figures/sentiment_all_cm.png); 
+    }
+    /* Chrome, Safari */
+    ::-webkit-scrollbar {
+    width: 15px;
+    height: 15px;
+
+    }
+    ::-webkit-scrollbar-track-piece  {
+    background-color: white;
+    }
+    ::-webkit-scrollbar-thumb:vertical {
+    height: 5px;
+    border-radius: 15px;
+    background-color: black;
+}
+  </style>
+  <script>
+
+  </script>
+</head>
+  <body>
+    <textarea id="source">
+
+class: middle
+
+# Large Scale Analysis of<br/> Historic Book Reviews: 
+
+<br/>
+<br/>
+
+## A Pilot Study of <em>The New York Times</em><br/> and Early 20th-century Reading
+
+<br/>
+<br/>
+
+#### Matthew Lavin
+#### Clinical Assistant Professor of English
+#### Director of Digital Media Lab
+#### University of Pittsburgh
+#### February 2018
+
+---
+class: middle
+
+# Can Machine Learning Predict the Presumed Gender of the Book's Author?
+
+???
+
+- #### If so, what are the superficial features that predict presumed gender?
+- #### What are the topical features that predict presumed gender?
+- #### What are the evaluative features that predict presumed gender?
+- #### What hypotheses or research questions can we form for large scale analysis of gender and book reviews?  
+- #### How might these hypotheses speak to prior scholarship on readership and gender at this time?
+
+---
+class: middle
+
+# Prior Scholarship on Readership and Gender
+
+- ### Reading Practices
+- ### Cultural Capital 
+- ### Middlebrow
+
+  - ### consumerism, instruction, morality, sentimentality, societal transformation, sophistication
+???
+  
+- #### The Rise of Middlebrow
+- #### Reading for the Author (Hochman 2009)
+- #### Emergence of the "Restricted Field of Cultural Production" (Bourdieu, 1993; 1996)
+
+---
+class: middle
+# Study Design: Data
+<br/>
+
+- ### <em>The New York Times Book Review</em>
+- ### Picked a Year: 1905
+- ### Approximately 4,000 articles
+- ### Approximately 1,000 book reviews
+- ### Genders of reviewed work's author tagged "assumed male," "assumed female," "multi," or "unknown"
+
+???
+
+  - #### Metadata taken from <em>The New York Times</em> API
+  - #### After hand-coding categories of content, selected approximately 1,000 book reviews
+  - #### Each review focuses on a single book
+  - #### Genders of reviewed work's author tagged "assumed male," "assumed female," "multi," or "unknown"
+  - #### Coding reflects review's subjectivity, not objective gender or sex of reviewed author
+  - #### Reviews are often anonymous
+  - #### Not feasible to code genders of book reviewers
+
+---
+class: middle
+
+# Study Design: Methods
+
+- ### Text Processing
+ 
+- ### Machine Learning 
+
+- ### Shuffe and Repeat
+
+- ### Feature Selection
+
+???
+ - #### OCR on NYT book reviews for all Labeled "assumed male" and "assumed female
+ - #### NLP to normalize text and lemmatize
+ - #### TF-IDF expressed in vector space
+ - #### Randomized partition to training and test with 200 test reviews
+ - #### Logistic regression (supervised, binary model) and evaluate accuracy
+ - #### Reshuffle training and test and repeat 999 more times, save results
+ - #### Do all above steps using six feature selection methods
+---
+
+class: middle
+
+<h2 class="performance">Model Performance</h2>
+
+<div id="stopwords" class="performance">
+<img class="hist" src=" figures/stopwords_hist.png"/>
+</div>
+<h4 class="performance">Filtered Features: Stopwords Only</h4>
+
+???
+- #### 83% mean accuracy
+---
+class: middle
+
+## Coefficients for Author Presumed Female
+
+#### Filtered Features: Stopwords Only
+<div class="table-wrapper">
+<table border="1" class="dataframe">
+  <thead>
+    <tr>
+      <th>feature</th>
+      <th>feature_averages</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>mrs</td>
+      <td>3.87</td>
+    </tr>
+    <tr>
+      <td>miss</td>
+      <td>3.54</td>
+    </tr>
+    <tr>
+      <td>woman</td>
+      <td>1.94</td>
+    </tr>
+    <tr>
+      <td>garden</td>
+      <td>1.61</td>
+    </tr>
+    <tr>
+      <td>life</td>
+      <td>1.36</td>
+    </tr>
+    <tr>
+      <td>girl</td>
+      <td>1.34</td>
+    </tr>
+    <tr>
+      <td>lady</td>
+      <td>1.30</td>
+    </tr>
+    <tr>
+      <td>catherine</td>
+      <td>1.29</td>
+    </tr>
+    <tr>
+      <td>art</td>
+      <td>1.27</td>
+    </tr>
+    <tr>
+      <td>mother</td>
+      <td>1.23</td>
+    </tr>
+    <tr>
+      <td>father</td>
+      <td>1.17</td>
+    </tr>
+    <tr>
+      <td>venice</td>
+      <td>1.17</td>
+    </tr>
+    <tr>
+      <td>mme</td>
+      <td>1.11</td>
+    </tr>
+    <tr>
+      <td>folk</td>
+      <td>1.09</td>
+    </tr>
+    <tr>
+      <td>taylor</td>
+      <td>1.07</td>
+    </tr>
+    <tr>
+      <td>sculpture</td>
+      <td>1.03</td>
+    </tr>
+    <tr>
+      <td>husband</td>
+      <td>1.01</td>
+    </tr>
+    <tr>
+      <td>florence</td>
+      <td>0.99</td>
+    </tr>
+    <tr>
+      <td>violin</td>
+      <td>0.97</td>
+    </tr>
+    <tr>
+      <td>daughter</td>
+      <td>0.96</td>
+    </tr>
+    <tr>
+      <td>giovanna</td>
+      <td>0.95</td>
+    </tr>
+    <tr>
+      <td>wife</td>
+      <td>0.92</td>
+    </tr>
+    <tr>
+      <td>home</td>
+      <td>0.90</td>
+    </tr>
+    <tr>
+      <td>brother</td>
+      <td>0.85</td>
+    </tr>
+    <tr>
+      <td>love</td>
+      <td>0.85</td>
+    </tr>
+    <tr>
+      <td>anna</td>
+      <td>0.85</td>
+    </tr>
+    <tr>
+      <td>heroine</td>
+      <td>0.85</td>
+    </tr>
+    <tr>
+      <td>rodin</td>
+      <td>0.84</td>
+    </tr>
+    <tr>
+      <td>italy</td>
+      <td>0.83</td>
+    </tr>
+    <tr>
+      <td>theodora</td>
+      <td>0.82</td>
+    </tr>
+    <tr>
+      <td>marriage</td>
+      <td>0.81</td>
+    </tr>
+    <tr>
+      <td>letter</td>
+      <td>0.81</td>
+    </tr>
+    <tr>
+      <td>catholic</td>
+      <td>0.80</td>
+    </tr>
+    <tr>
+      <td>thy</td>
+      <td>0.79</td>
+    </tr>
+    <tr>
+      <td>abbey</td>
+      <td>0.78</td>
+    </tr>
+    <tr>
+      <td>sin</td>
+      <td>0.78</td>
+    </tr>
+    <tr>
+      <td>charm</td>
+      <td>0.78</td>
+    </tr>
+    <tr>
+      <td>billy</td>
+      <td>0.78</td>
+    </tr>
+    <tr>
+      <td>cook</td>
+      <td>0.78</td>
+    </tr>
+    <tr>
+      <td>si</td>
+      <td>0.77</td>
+    </tr>
+    <tr>
+      <td>sandy</td>
+      <td>0.76</td>
+    </tr>
+    <tr>
+      <td>polly</td>
+      <td>0.75</td>
+    </tr>
+    <tr>
+      <td>tragedy</td>
+      <td>0.74</td>
+    </tr>
+    <tr>
+      <td>pleasant</td>
+      <td>0.74</td>
+    </tr>
+    <tr>
+      <td>empress</td>
+      <td>0.74</td>
+    </tr>
+    <tr>
+      <td>austen</td>
+      <td>0.74</td>
+    </tr>
+    <tr>
+      <td>author</td>
+      <td>0.73</td>
+    </tr>
+    <tr>
+      <td>maynard</td>
+      <td>0.72</td>
+    </tr>
+    <tr>
+      <td>music</td>
+      <td>0.72</td>
+    </tr>
+    <tr>
+      <td>visit</td>
+      <td>0.72</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+---
+class:middle
+
+## Apparent Term Groupings
+
+<table class="term-groups">
+<tbody>
+<tr>
+  <th>authorship specific terms</th>
+  <td>author, letter</td>
+</tr>
+<tr>
+  <th>forenames</th>
+  <td>anna, austen, billy, catherine, giovanna, maynard, polly, theodora</td>
+</tr>
+<tr>
+  <th>gendered titles and terms</th>
+  <td>brother, daughter, empress, father, girl, heroine, husband, lady, miss, mme, mother, mrs, wife, woman</td>
+</tr>
+<tr>
+  <th>topical/thematic</th>
+  <td>abbey, art, catholic, charm, cook, florence, folk, garden, home, italy, life, love, marriage, music, pleasant, rodin, sandy, sculpture, si</td>
+</tr>
+</tbody></table>
+
+???
+
+- #### Some of these could belong to more than one group
+
+---
+class: middle
+
+## Coefficients for Author Presumed Male
+
+#### Filtered Features: Stopwords Only
+<div class="table-wrapper">
+  <table border="1" class="dataframe">
+  <thead>
+    <tr>
+      <th>feature</th>
+      <th>feature_averages</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>dr</td>
+      <td>-1.52</td>
+    </tr>
+    <tr>
+      <td>volume</td>
+      <td>-1.33</td>
+    </tr>
+    <tr>
+      <td>prof</td>
+      <td>-1.21</td>
+    </tr>
+    <tr>
+      <td>state</td>
+      <td>-0.91</td>
+    </tr>
+    <tr>
+      <td>george</td>
+      <td>-0.88</td>
+    </tr>
+    <tr>
+      <td>power</td>
+      <td>-0.78</td>
+    </tr>
+    <tr>
+      <td>william</td>
+      <td>-0.78</td>
+    </tr>
+    <tr>
+      <td>indian</td>
+      <td>-0.78</td>
+    </tr>
+    <tr>
+      <td>adventure</td>
+      <td>-0.76</td>
+    </tr>
+    <tr>
+      <td>shakespeare</td>
+      <td>-0.72</td>
+    </tr>
+    <tr>
+      <td>numb</td>
+      <td>-0.71</td>
+    </tr>
+    <tr>
+      <td>sea</td>
+      <td>-0.71</td>
+    </tr>
+    <tr>
+      <td>history</td>
+      <td>-0.70</td>
+    </tr>
+    <tr>
+      <td>game</td>
+      <td>-0.69</td>
+    </tr>
+    <tr>
+      <td>north</td>
+      <td>-0.68</td>
+    </tr>
+    <tr>
+      <td>map</td>
+      <td>-0.67</td>
+    </tr>
+    <tr>
+      <td>great</td>
+      <td>-0.66</td>
+    </tr>
+    <tr>
+      <td>edition</td>
+      <td>-0.66</td>
+    </tr>
+    <tr>
+      <td>article</td>
+      <td>-0.61</td>
+    </tr>
+    <tr>
+      <td>political</td>
+      <td>-0.61</td>
+    </tr>
+    <tr>
+      <td>point</td>
+      <td>-0.61</td>
+    </tr>
+    <tr>
+      <td>army</td>
+      <td>-0.60</td>
+    </tr>
+    <tr>
+      <td>man</td>
+      <td>-0.59</td>
+    </tr>
+    <tr>
+      <td>island</td>
+      <td>-0.59</td>
+    </tr>
+    <tr>
+      <td>fact</td>
+      <td>-0.58</td>
+    </tr>
+    <tr>
+      <td>robert</td>
+      <td>-0.57</td>
+    </tr>
+    <tr>
+      <td>law</td>
+      <td>-0.57</td>
+    </tr>
+    <tr>
+      <td>thoma</td>
+      <td>-0.57</td>
+    </tr>
+    <tr>
+      <td>animal</td>
+      <td>-0.57</td>
+    </tr>
+    <tr>
+      <td>ship</td>
+      <td>-0.56</td>
+    </tr>
+    <tr>
+      <td>captain</td>
+      <td>-0.55</td>
+    </tr>
+    <tr>
+      <td>edit</td>
+      <td>-0.55</td>
+    </tr>
+    <tr>
+      <td>university</td>
+      <td>-0.54</td>
+    </tr>
+    <tr>
+      <td>russian</td>
+      <td>-0.54</td>
+    </tr>
+    <tr>
+      <td>essay</td>
+      <td>-0.54</td>
+    </tr>
+    <tr>
+      <td>british</td>
+      <td>-0.53</td>
+    </tr>
+    <tr>
+      <td>napoleon</td>
+      <td>-0.52</td>
+    </tr>
+    <tr>
+      <td>series</td>
+      <td>-0.52</td>
+    </tr>
+    <tr>
+      <td>include</td>
+      <td>-0.52</td>
+    </tr>
+    <tr>
+      <td>wood</td>
+      <td>-0.51</td>
+    </tr>
+    <tr>
+      <td>expedition</td>
+      <td>-0.51</td>
+    </tr>
+    <tr>
+      <td>canada</td>
+      <td>-0.50</td>
+    </tr>
+    <tr>
+      <td>l</td>
+      <td>-0.49</td>
+    </tr>
+    <tr>
+      <td>r</td>
+      <td>-0.48</td>
+    </tr>
+    <tr>
+      <td>poet</td>
+      <td>-0.48</td>
+    </tr>
+    <tr>
+      <td>tho</td>
+      <td>-0.48</td>
+    </tr>
+    <tr>
+      <td>russia</td>
+      <td>-0.47</td>
+    </tr>
+    <tr>
+      <td>h</td>
+      <td>-0.47</td>
+    </tr>
+    <tr>
+      <td>emperor</td>
+      <td>-0.47</td>
+    </tr>
+    <tr>
+      <td>boy</td>
+      <td>-0.47</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+---
+class:middle
+
+## Apparent Term Groupings
+
+<table class="term-groups">
+<tbody>
+<tr>
+  <th>authorship specific terms</th>
+  <td>article, edit, edition, essay, poet, series, volume</td>
+</tr>
+<tr>
+  <th>forename</th>
+  <td>george, robert, thoma, william</td>
+</tr>
+<tr>
+  <th>gendered titles and terms</th>
+  <td>boy, man</td>
+</tr> 
+<tr>
+  <th>topical/thematic</th>
+  <td>adventure, animal, army, british, canada, captain, dr, emperor, expedition, fact, game, great, history, indian, island, law, map, napoleon, north, numb, point, political, power, prof, russia, russian, sea, shakespeare, ship, state, university, wood</td>
+</tr>
+</tbody>
+</table>
+
+#### Some others
+
+<table class="term-groups">
+  <tbody>
+    <tr>
+  <th>initials</th>
+  <td>h, l, r</td>
+</tr> 
+<tr>
+  <th>procedural terms</th>
+  <td>include, tho</td>
+</tr>
+  </tbody>
+
+---
+class: middle
+
+# In Other Words
+
+- ### The superficial layer of gender norming tells us more than you might think 
+
+???
+  - #### Author gender is almost always assigned in the review 
+  - #### Based on forename? Known beforehand by reviewer?
+  - #### Gender labels are reinforced by titles and pronouns
+  - #### Dr. and Prof., while not inherently gendered terms, almost always label men 
+  - #### Relates to Hochman and reading for the author
+
+---
+class: middle
+
+# How Much Accuracy is Lost When Gendered Titles and Pronouns Are Removed?
+
+---
+class: middle
+
+<h2 class="performance">Model Performance</h2>
+
+<div id="stop_pro" class="performance">
+<img class="hist" src=" figures/stop_pro_hist.png"/>
+</div>
+
+<h4 class="performance">Filtered Features: Stopwords and Pronouns</h4>
+???
+- #### 77% accuracy
+
+---
+class: middle
+
+## Coefficients for Author Presumed Female
+
+#### Filtered Features: Stopwords and Pronouns
+
+<div class="table-wrapper">
+  <table border="1" class="dataframe">
+  <thead>
+    <tr>
+      <th>feature</th>
+      <th>feature_averages</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>garden</td>
+      <td>1.66</td>
+    </tr>
+    <tr>
+      <td>life</td>
+      <td>1.55</td>
+    </tr>
+    <tr>
+      <td>catherine</td>
+      <td>1.50</td>
+    </tr>
+    <tr>
+      <td>art</td>
+      <td>1.36</td>
+    </tr>
+    <tr>
+      <td>mme</td>
+      <td>1.33</td>
+    </tr>
+    <tr>
+      <td>taylor</td>
+      <td>1.19</td>
+    </tr>
+    <tr>
+      <td>venice</td>
+      <td>1.17</td>
+    </tr>
+    <tr>
+      <td>home</td>
+      <td>1.14</td>
+    </tr>
+    <tr>
+      <td>florence</td>
+      <td>1.14</td>
+    </tr>
+    <tr>
+      <td>letter</td>
+      <td>1.13</td>
+    </tr>
+    <tr>
+      <td>heroine</td>
+      <td>1.13</td>
+    </tr>
+    <tr>
+      <td>sculpture</td>
+      <td>1.11</td>
+    </tr>
+    <tr>
+      <td>marriage</td>
+      <td>1.07</td>
+    </tr>
+    <tr>
+      <td>violin</td>
+      <td>1.06</td>
+    </tr>
+    <tr>
+      <td>folk</td>
+      <td>1.05</td>
+    </tr>
+    <tr>
+      <td>giovanna</td>
+      <td>1.04</td>
+    </tr>
+    <tr>
+      <td>love</td>
+      <td>1.04</td>
+    </tr>
+    <tr>
+      <td>tragedy</td>
+      <td>0.99</td>
+    </tr>
+    <tr>
+      <td>mary</td>
+      <td>0.99</td>
+    </tr>
+    <tr>
+      <td>sin</td>
+      <td>0.95</td>
+    </tr>
+    <tr>
+      <td>charm</td>
+      <td>0.93</td>
+    </tr>
+    <tr>
+      <td>abbey</td>
+      <td>0.91</td>
+    </tr>
+    <tr>
+      <td>author</td>
+      <td>0.89</td>
+    </tr>
+    <tr>
+      <td>theodora</td>
+      <td>0.87</td>
+    </tr>
+    <tr>
+      <td>billy</td>
+      <td>0.86</td>
+    </tr>
+    <tr>
+      <td>catholic</td>
+      <td>0.86</td>
+    </tr>
+    <tr>
+      <td>anna</td>
+      <td>0.86</td>
+    </tr>
+    <tr>
+      <td>austen</td>
+      <td>0.85</td>
+    </tr>
+    <tr>
+      <td>margaret</td>
+      <td>0.85</td>
+    </tr>
+    <tr>
+      <td>wright</td>
+      <td>0.84</td>
+    </tr>
+    <tr>
+      <td>empress</td>
+      <td>0.83</td>
+    </tr>
+    <tr>
+      <td>polly</td>
+      <td>0.83</td>
+    </tr>
+    <tr>
+      <td>thy</td>
+      <td>0.83</td>
+    </tr>
+    <tr>
+      <td>rodin</td>
+      <td>0.83</td>
+    </tr>
+    <tr>
+      <td>young</td>
+      <td>0.82</td>
+    </tr>
+    <tr>
+      <td>old</td>
+      <td>0.81</td>
+    </tr>
+    <tr>
+      <td>visit</td>
+      <td>0.81</td>
+    </tr>
+    <tr>
+      <td>saint</td>
+      <td>0.80</td>
+    </tr>
+    <tr>
+      <td>italy</td>
+      <td>0.80</td>
+    </tr>
+    <tr>
+      <td>pleasant</td>
+      <td>0.79</td>
+    </tr>
+    <tr>
+      <td>sylvia</td>
+      <td>0.79</td>
+    </tr>
+    <tr>
+      <td>moran</td>
+      <td>0.78</td>
+    </tr>
+    <tr>
+      <td>lavinia</td>
+      <td>0.78</td>
+    </tr>
+    <tr>
+      <td>tender</td>
+      <td>0.78</td>
+    </tr>
+    <tr>
+      <td>music</td>
+      <td>0.76</td>
+    </tr>
+    <tr>
+      <td>serena</td>
+      <td>0.75</td>
+    </tr>
+    <tr>
+      <td>si</td>
+      <td>0.75</td>
+    </tr>
+    <tr>
+      <td>chilean</td>
+      <td>0.74</td>
+    </tr>
+    <tr>
+      <td>tin</td>
+      <td>0.74</td>
+    </tr>
+    <tr>
+      <td>cook</td>
+      <td>0.74</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+---
+class: middle
+
+## Coefficients for Author Presumed Male
+
+#### Filtered Features: Stopwords and Pronouns
+
+<div class="table-wrapper">
+  <table border="1" class="dataframe">
+  <thead>
+    <tr>
+      <th>feature</th>
+      <th>feature_averages</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>volume</td>
+      <td>-1.49</td>
+    </tr>
+    <tr>
+      <td>prof</td>
+      <td>-1.27</td>
+    </tr>
+    <tr>
+      <td>state</td>
+      <td>-1.07</td>
+    </tr>
+    <tr>
+      <td>george</td>
+      <td>-0.97</td>
+    </tr>
+    <tr>
+      <td>indian</td>
+      <td>-0.86</td>
+    </tr>
+    <tr>
+      <td>power</td>
+      <td>-0.85</td>
+    </tr>
+    <tr>
+      <td>adventure</td>
+      <td>-0.82</td>
+    </tr>
+    <tr>
+      <td>history</td>
+      <td>-0.81</td>
+    </tr>
+    <tr>
+      <td>sea</td>
+      <td>-0.80</td>
+    </tr>
+    <tr>
+      <td>william</td>
+      <td>-0.79</td>
+    </tr>
+    <tr>
+      <td>shakespeare</td>
+      <td>-0.79</td>
+    </tr>
+    <tr>
+      <td>political</td>
+      <td>-0.77</td>
+    </tr>
+    <tr>
+      <td>great</td>
+      <td>-0.76</td>
+    </tr>
+    <tr>
+      <td>north</td>
+      <td>-0.76</td>
+    </tr>
+    <tr>
+      <td>game</td>
+      <td>-0.76</td>
+    </tr>
+    <tr>
+      <td>map</td>
+      <td>-0.75</td>
+    </tr>
+    <tr>
+      <td>edition</td>
+      <td>-0.74</td>
+    </tr>
+    <tr>
+      <td>numb</td>
+      <td>-0.73</td>
+    </tr>
+    <tr>
+      <td>thoma</td>
+      <td>-0.72</td>
+    </tr>
+    <tr>
+      <td>article</td>
+      <td>-0.69</td>
+    </tr>
+    <tr>
+      <td>island</td>
+      <td>-0.68</td>
+    </tr>
+    <tr>
+      <td>robert</td>
+      <td>-0.67</td>
+    </tr>
+    <tr>
+      <td>army</td>
+      <td>-0.66</td>
+    </tr>
+    <tr>
+      <td>ship</td>
+      <td>-0.66</td>
+    </tr>
+    <tr>
+      <td>series</td>
+      <td>-0.65</td>
+    </tr>
+    <tr>
+      <td>point</td>
+      <td>-0.65</td>
+    </tr>
+    <tr>
+      <td>animal</td>
+      <td>-0.65</td>
+    </tr>
+    <tr>
+      <td>napoleon</td>
+      <td>-0.65</td>
+    </tr>
+    <tr>
+      <td>fact</td>
+      <td>-0.61</td>
+    </tr>
+    <tr>
+      <td>poet</td>
+      <td>-0.60</td>
+    </tr>
+    <tr>
+      <td>essay</td>
+      <td>-0.59</td>
+    </tr>
+    <tr>
+      <td>ireland</td>
+      <td>-0.58</td>
+    </tr>
+    <tr>
+      <td>include</td>
+      <td>-0.58</td>
+    </tr>
+    <tr>
+      <td>expedition</td>
+      <td>-0.57</td>
+    </tr>
+    <tr>
+      <td>edit</td>
+      <td>-0.57</td>
+    </tr>
+    <tr>
+      <td>captain</td>
+      <td>-0.57</td>
+    </tr>
+    <tr>
+      <td>canada</td>
+      <td>-0.56</td>
+    </tr>
+    <tr>
+      <td>russia</td>
+      <td>-0.56</td>
+    </tr>
+    <tr>
+      <td>poetry</td>
+      <td>-0.56</td>
+    </tr>
+    <tr>
+      <td>wood</td>
+      <td>-0.55</td>
+    </tr>
+    <tr>
+      <td>policy</td>
+      <td>-0.54</td>
+    </tr>
+    <tr>
+      <td>present</td>
+      <td>-0.54</td>
+    </tr>
+    <tr>
+      <td>russian</td>
+      <td>-0.54</td>
+    </tr>
+    <tr>
+      <td>l</td>
+      <td>-0.53</td>
+    </tr>
+    <tr>
+      <td>discuss</td>
+      <td>-0.52</td>
+    </tr>
+    <tr>
+      <td>london</td>
+      <td>-0.52</td>
+    </tr>
+    <tr>
+      <td>university</td>
+      <td>-0.52</td>
+    </tr>
+    <tr>
+      <td>constitution</td>
+      <td>-0.51</td>
+    </tr>
+    <tr>
+      <td>arthur</td>
+      <td>-0.51</td>
+    </tr>
+    <tr>
+      <td>british</td>
+      <td>-0.51</td>
+    </tr>
+  </tbody>
+</table>  
+</div>
+
+---
+class: middle
+
+# Removing Common Forenames and Interpreting Commonalities
+
+---
+class: middle
+
+<h2 class="performance">Model Performance</h2>
+
+<div id="stop_pro_names" class="performance">
+<img class="hist" src=" figures/stop_pro_names_hist.png"/>
+</div>
+
+<h4 class="performance">Filtered Features: Stopwords, Pronouns, and Common Forenames</h4>
+
+???
+
+- #### 76% accuracy
+---
+class: middle
+
+## Coefficients for Author Presumed Female
+
+#### Filtered Features: Stopwords, Pronouns, and Common Forenames
+
+<div class="table-wrapper">
+  <table border="1" class="dataframe">
+  <thead>
+    <tr>
+      <th>feature</th>
+      <th>feature_averages</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>garden</td>
+      <td>1.76</td>
+    </tr>
+    <tr>
+      <td>life</td>
+      <td>1.74</td>
+    </tr>
+    <tr>
+      <td>sculpture</td>
+      <td>1.58</td>
+    </tr>
+    <tr>
+      <td>mme</td>
+      <td>1.40</td>
+    </tr>
+    <tr>
+      <td>home</td>
+      <td>1.32</td>
+    </tr>
+    <tr>
+      <td>heroine</td>
+      <td>1.17</td>
+    </tr>
+    <tr>
+      <td>marriage</td>
+      <td>1.14</td>
+    </tr>
+    <tr>
+      <td>folk</td>
+      <td>1.10</td>
+    </tr>
+    <tr>
+      <td>venice</td>
+      <td>1.07</td>
+    </tr>
+    <tr>
+      <td>c</td>
+      <td>1.06</td>
+    </tr>
+    <tr>
+      <td>letter</td>
+      <td>1.06</td>
+    </tr>
+    <tr>
+      <td>tragedy</td>
+      <td>1.05</td>
+    </tr>
+    <tr>
+      <td>violin</td>
+      <td>1.04</td>
+    </tr>
+    <tr>
+      <td>author</td>
+      <td>1.04</td>
+    </tr>
+    <tr>
+      <td>old</td>
+      <td>1.01</td>
+    </tr>
+    <tr>
+      <td>charm</td>
+      <td>1.01</td>
+    </tr>
+    <tr>
+      <td>thy</td>
+      <td>0.96</td>
+    </tr>
+    <tr>
+      <td>sin</td>
+      <td>0.96</td>
+    </tr>
+    <tr>
+      <td>empress</td>
+      <td>0.95</td>
+    </tr>
+    <tr>
+      <td>tender</td>
+      <td>0.94</td>
+    </tr>
+    <tr>
+      <td>rodin</td>
+      <td>0.93</td>
+    </tr>
+    <tr>
+      <td>saint</td>
+      <td>0.90</td>
+    </tr>
+    <tr>
+      <td>pleasant</td>
+      <td>0.89</td>
+    </tr>
+    <tr>
+      <td>visit</td>
+      <td>0.88</td>
+    </tr>
+    <tr>
+      <td>young</td>
+      <td>0.85</td>
+    </tr>
+    <tr>
+      <td>cook</td>
+      <td>0.85</td>
+    </tr>
+    <tr>
+      <td>story</td>
+      <td>0.83</td>
+    </tr>
+    <tr>
+      <td>italy</td>
+      <td>0.83</td>
+    </tr>
+    <tr>
+      <td>music</td>
+      <td>0.83</td>
+    </tr>
+    <tr>
+      <td>baroness</td>
+      <td>0.81</td>
+    </tr>
+    <tr>
+      <td>hear</td>
+      <td>0.80</td>
+    </tr>
+    <tr>
+      <td>religious</td>
+      <td>0.80</td>
+    </tr>
+    <tr>
+      <td>time</td>
+      <td>0.80</td>
+    </tr>
+    <tr>
+      <td>catholic</td>
+      <td>0.78</td>
+    </tr>
+    <tr>
+      <td>widow</td>
+      <td>0.77</td>
+    </tr>
+    <tr>
+      <td>tin</td>
+      <td>0.77</td>
+    </tr>
+    <tr>
+      <td>family</td>
+      <td>0.77</td>
+    </tr>
+    <tr>
+      <td>siena</td>
+      <td>0.75</td>
+    </tr>
+    <tr>
+      <td>little</td>
+      <td>0.74</td>
+    </tr>
+    <tr>
+      <td>saintly</td>
+      <td>0.74</td>
+    </tr>
+    <tr>
+      <td>pink</td>
+      <td>0.74</td>
+    </tr>
+    <tr>
+      <td>paint</td>
+      <td>0.73</td>
+    </tr>
+    <tr>
+      <td>reverend</td>
+      <td>0.73</td>
+    </tr>
+    <tr>
+      <td>constantino</td>
+      <td>0.72</td>
+    </tr>
+    <tr>
+      <td>spend</td>
+      <td>0.72</td>
+    </tr>
+    <tr>
+      <td>fer</td>
+      <td>0.72</td>
+    </tr>
+    <tr>
+      <td>ye</td>
+      <td>0.71</td>
+    </tr>
+    <tr>
+      <td>nightingale</td>
+      <td>0.71</td>
+    </tr>
+    <tr>
+      <td>beauty</td>
+      <td>0.71</td>
+    </tr>
+    <tr>
+      <td>chilean</td>
+      <td>0.69</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+---
+class: middle
+
+## Apparent Term Groupings
+
+<table class="term-groups">
+<tbody>
+<tr>
+  <th>art and music</th>
+  <td>music, paint, rodin, sculpture, violin</td>
+</tr>
+<tr>
+  <th>authorship specific terms</th>
+  <td>author, letter, story</td>
+</tr>
+<tr>
+  <th>domesticity/home/family</th>
+  <td>cook, family, garden, home, marriage, widow</td>
+</tr> 
+<tr>
+  <th>gendered titles and terms</th>
+  <td>fer, mme</td>
+</tr>
+<tr>
+  <th>initials</th>
+  <td>c</td>
+</tr>
+<tr>
+  <th>morality/religion</th>
+  <td>catholic, religious, reverend, saint, saintly, sin, thy, tin, ye</td>
+</tr>
+<tr>
+  <th>other</th>
+  <td>beauty, charm, folk, hear, heroine, life, little, nightingale, old, pink, pleasant, spend, tender, time, tragedy, young</td>
+</tr>
+<tr>
+  <th>places/geographies
+</th>
+  <td>chilean, constantino, italy, siena, venice, visit</td>
+</tr>
+<tr>
+  <th>royalty and titles</th>
+  <td>baroness, empress</td>
+</tr>
+</tbody>
+</table>
+
+---
+class: middle
+
+## Coefficients for Author Presumed Male
+
+#### Filtered Features: Stopwords, Pronouns, and Common Forenames
+
+<div class="table-wrapper">
+ <table border="1" class="dataframe">
+  <thead>
+    <tr>
+      <th>feature</th>
+      <th>feature_averages</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>volume</td>
+      <td>-1.47</td>
+    </tr>
+    <tr>
+      <td>prof</td>
+      <td>-1.31</td>
+    </tr>
+    <tr>
+      <td>state</td>
+      <td>-1.09</td>
+    </tr>
+    <tr>
+      <td>indian</td>
+      <td>-0.95</td>
+    </tr>
+    <tr>
+      <td>adventure</td>
+      <td>-0.91</td>
+    </tr>
+    <tr>
+      <td>sea</td>
+      <td>-0.86</td>
+    </tr>
+    <tr>
+      <td>game</td>
+      <td>-0.85</td>
+    </tr>
+    <tr>
+      <td>power</td>
+      <td>-0.84</td>
+    </tr>
+    <tr>
+      <td>shakespeare</td>
+      <td>-0.81</td>
+    </tr>
+    <tr>
+      <td>map</td>
+      <td>-0.81</td>
+    </tr>
+    <tr>
+      <td>political</td>
+      <td>-0.80</td>
+    </tr>
+    <tr>
+      <td>numb</td>
+      <td>-0.79</td>
+    </tr>
+    <tr>
+      <td>north</td>
+      <td>-0.78</td>
+    </tr>
+    <tr>
+      <td>animal</td>
+      <td>-0.77</td>
+    </tr>
+    <tr>
+      <td>thoma</td>
+      <td>-0.77</td>
+    </tr>
+    <tr>
+      <td>island</td>
+      <td>-0.76</td>
+    </tr>
+    <tr>
+      <td>article</td>
+      <td>-0.75</td>
+    </tr>
+    <tr>
+      <td>history</td>
+      <td>-0.74</td>
+    </tr>
+    <tr>
+      <td>great</td>
+      <td>-0.71</td>
+    </tr>
+    <tr>
+      <td>edition</td>
+      <td>-0.70</td>
+    </tr>
+    <tr>
+      <td>fact</td>
+      <td>-0.69</td>
+    </tr>
+    <tr>
+      <td>ship</td>
+      <td>-0.68</td>
+    </tr>
+    <tr>
+      <td>army</td>
+      <td>-0.68</td>
+    </tr>
+    <tr>
+      <td>include</td>
+      <td>-0.68</td>
+    </tr>
+    <tr>
+      <td>series</td>
+      <td>-0.67</td>
+    </tr>
+    <tr>
+      <td>point</td>
+      <td>-0.67</td>
+    </tr>
+    <tr>
+      <td>edit</td>
+      <td>-0.66</td>
+    </tr>
+    <tr>
+      <td>expedition</td>
+      <td>-0.64</td>
+    </tr>
+    <tr>
+      <td>essay</td>
+      <td>-0.63</td>
+    </tr>
+    <tr>
+      <td>captain</td>
+      <td>-0.63</td>
+    </tr>
+    <tr>
+      <td>h</td>
+      <td>-0.61</td>
+    </tr>
+    <tr>
+      <td>british</td>
+      <td>-0.61</td>
+    </tr>
+    <tr>
+      <td>ireland</td>
+      <td>-0.59</td>
+    </tr>
+    <tr>
+      <td>russia</td>
+      <td>-0.59</td>
+    </tr>
+    <tr>
+      <td>poet</td>
+      <td>-0.58</td>
+    </tr>
+    <tr>
+      <td>emperor</td>
+      <td>-0.58</td>
+    </tr>
+    <tr>
+      <td>london</td>
+      <td>-0.57</td>
+    </tr>
+    <tr>
+      <td>law</td>
+      <td>-0.57</td>
+    </tr>
+    <tr>
+      <td>governor</td>
+      <td>-0.57</td>
+    </tr>
+    <tr>
+      <td>present</td>
+      <td>-0.57</td>
+    </tr>
+    <tr>
+      <td>policy</td>
+      <td>-0.57</td>
+    </tr>
+    <tr>
+      <td>l</td>
+      <td>-0.56</td>
+    </tr>
+    <tr>
+      <td>j</td>
+      <td>-0.55</td>
+    </tr>
+    <tr>
+      <td>university</td>
+      <td>-0.55</td>
+    </tr>
+    <tr>
+      <td>r</td>
+      <td>-0.55</td>
+    </tr>
+    <tr>
+      <td>admit</td>
+      <td>-0.55</td>
+    </tr>
+    <tr>
+      <td>discuss</td>
+      <td>-0.54</td>
+    </tr>
+    <tr>
+      <td>guide</td>
+      <td>-0.53</td>
+    </tr>
+    <tr>
+      <td>divide</td>
+      <td>-0.53</td>
+    </tr>
+    <tr>
+      <td>poetry</td>
+      <td>-0.53</td>
+    </tr>
+  </tbody>
+</table> 
+</div>
+
+---
+class: middle 
+
+## Apparent Term Groupings
+
+<table class="term-groups">
+<tbody>
+
+  <th>authorship specific terms</th>
+  <td>article, edit, edition, essay, guide, poet, poetry, series, volume</td>
+</tr>
+<tr>
+  <th>forename</th>
+  <td>thoma</td>
+</tr>
+<tr>
+  <th>government/policy/affairs of state</th>
+  <td>army, governor, indian, law, policy, political, power, state</td>
+</tr>  
+<tr>
+  <th>initials</th>
+  <td>h, j, l, r</td>
+</tr>
+<tr>
+  <th>other</th>
+  <td>animal, fact, game, great, history, numb, prof, shakespeare, university</td>
+</tr>
+<tr>
+  <th>places/geographies</th>
+  <td>adventure, british, captain, expedition, ireland, island, london, map, north, russia, sea, ship</td>
+</tr>
+<tr>
+  <th>procedural</th>
+  <td>admit, discuss, divide, include, point, present</td>
+</tr>
+<tr>
+  <th>royalty and titles</th>
+  <td>emperor</td>
+</tr>
+</tbody>
+</table>
+---
+class: middle
+
+# In Other Words
+
+- ### When the most superficially gendered features are removed, topical norms still predict gender 
+
+- ### Presumed author gender is strongly associated with topical and evaluative vocabularies
+
+???
+
+- #### Topic of reviewed work and evaluation of reviewed work are difficult to separate 
+
+
+---
+class: middle
+
+# Focusing on Positive Sentiment Features
+
+---
+class: middle
+
+<h2 class="performance">Model Performance</h2>
+
+<div id="sentiment_pos" class="performance">
+<img class="hist" src=" figures/sentiment_pos_hist.png"/>
+</div>
+
+<h4 class="performance">Features: Terms Associated with Positive Sentiment</h4>
+???
+- #### 72% accuracy
+
+---
+class: middle
+
+## Coefficients for Author Presumed Female
+
+#### Features: Terms Associated with Positive Sentiment
+
+<div class="table-wrapper">
+  <table border="1" class="dataframe">
+  <thead>
+    <tr>
+      <th>feature</th>
+      <th>feature_averages</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>mother</td>
+      <td>2.28</td>
+    </tr>
+    <tr>
+      <td>garden</td>
+      <td>2.16</td>
+    </tr>
+    <tr>
+      <td>sculpture</td>
+      <td>2.01</td>
+    </tr>
+    <tr>
+      <td>charm</td>
+      <td>1.78</td>
+    </tr>
+    <tr>
+      <td>heroine</td>
+      <td>1.71</td>
+    </tr>
+    <tr>
+      <td>visit</td>
+      <td>1.65</td>
+    </tr>
+    <tr>
+      <td>art</td>
+      <td>1.64</td>
+    </tr>
+    <tr>
+      <td>tender</td>
+      <td>1.63</td>
+    </tr>
+    <tr>
+      <td>joy</td>
+      <td>1.59</td>
+    </tr>
+    <tr>
+      <td>daughter</td>
+      <td>1.57</td>
+    </tr>
+    <tr>
+      <td>hardy</td>
+      <td>1.49</td>
+    </tr>
+    <tr>
+      <td>brother</td>
+      <td>1.49</td>
+    </tr>
+    <tr>
+      <td>marriage</td>
+      <td>1.48</td>
+    </tr>
+    <tr>
+      <td>apologize</td>
+      <td>1.40</td>
+    </tr>
+    <tr>
+      <td>pleasant</td>
+      <td>1.40</td>
+    </tr>
+    <tr>
+      <td>nurse</td>
+      <td>1.26</td>
+    </tr>
+    <tr>
+      <td>shine</td>
+      <td>1.19</td>
+    </tr>
+    <tr>
+      <td>breakfast</td>
+      <td>1.18</td>
+    </tr>
+    <tr>
+      <td>clever</td>
+      <td>1.16</td>
+    </tr>
+    <tr>
+      <td>pope</td>
+      <td>1.15</td>
+    </tr>
+    <tr>
+      <td>bridesmaid</td>
+      <td>1.10</td>
+    </tr>
+    <tr>
+      <td>masculine</td>
+      <td>1.09</td>
+    </tr>
+    <tr>
+      <td>music</td>
+      <td>1.08</td>
+    </tr>
+    <tr>
+      <td>vivacious</td>
+      <td>1.06</td>
+    </tr>
+    <tr>
+      <td>saintly</td>
+      <td>1.01</td>
+    </tr>
+    <tr>
+      <td>love</td>
+      <td>1.00</td>
+    </tr>
+    <tr>
+      <td>counsel</td>
+      <td>1.00</td>
+    </tr>
+    <tr>
+      <td>salute</td>
+      <td>0.99</td>
+    </tr>
+    <tr>
+      <td>dance</td>
+      <td>0.98</td>
+    </tr>
+    <tr>
+      <td>correspondence</td>
+      <td>0.98</td>
+    </tr>
+    <tr>
+      <td>cherry</td>
+      <td>0.98</td>
+    </tr>
+    <tr>
+      <td>ballad</td>
+      <td>0.98</td>
+    </tr>
+    <tr>
+      <td>baby</td>
+      <td>0.98</td>
+    </tr>
+    <tr>
+      <td>romance</td>
+      <td>0.98</td>
+    </tr>
+    <tr>
+      <td>respectful</td>
+      <td>0.97</td>
+    </tr>
+    <tr>
+      <td>humble</td>
+      <td>0.96</td>
+    </tr>
+    <tr>
+      <td>dinner</td>
+      <td>0.95</td>
+    </tr>
+    <tr>
+      <td>royalty</td>
+      <td>0.94</td>
+    </tr>
+    <tr>
+      <td>monk</td>
+      <td>0.90</td>
+    </tr>
+    <tr>
+      <td>caretaker</td>
+      <td>0.90</td>
+    </tr>
+    <tr>
+      <td>picturesque</td>
+      <td>0.90</td>
+    </tr>
+    <tr>
+      <td>reverend</td>
+      <td>0.89</td>
+    </tr>
+    <tr>
+      <td>freely</td>
+      <td>0.88</td>
+    </tr>
+    <tr>
+      <td>confess</td>
+      <td>0.88</td>
+    </tr>
+    <tr>
+      <td>fancy</td>
+      <td>0.88</td>
+    </tr>
+    <tr>
+      <td>sex</td>
+      <td>0.87</td>
+    </tr>
+    <tr>
+      <td>sun</td>
+      <td>0.87</td>
+    </tr>
+    <tr>
+      <td>unexpected</td>
+      <td>0.86</td>
+    </tr>
+    <tr>
+      <td>young</td>
+      <td>0.85</td>
+    </tr>
+    <tr>
+      <td>priestly</td>
+      <td>0.85</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+---
+class:middle
+
+## Parts of Speech for Author Presumed Female
+
+#### Features: Terms Associated with Positive Sentiment
+
+<table class="term-groups">
+<tbody>
+<tr>
+  <th>Adjectives</th>
+  <td>cherry, clever, fancy, hardy, humble, masculine, picturesque, pleasant, priestly, respectful, reverend, romance, saintly, tender, unexpected, vivacious, young</td>
+</tr>
+<tr>
+  <th>Adverbs</th>
+  <td>freely, priestly, saintly</td>
+</tr>
+<tr>
+  <th>Nouns</th>
+  <td>art, baby, ballad, breakfast, bridesmaid, brother, caretaker, charm, cherry, confess, correspondence, counsel, dance, daughter, dinner, fancy, garden, hardy, heroine, joy, love, marriage, masculine, monk, mother, music, nurse, pope, reverend, romance, royalty, salute, sculpture, sex, shine, sun, tender, visit, young </td>
+</tr> 
+<tr>
+  <th>Verbs</th>
+  <td>apologize, baby, breakfast, charm, confess, counsel, dance, fancy, garden, humble, joy, love, mother, nurse, romance, salute, sculpture, sex, shine, sun, tender, visit</td>
+</tr>
+</tbody>
+</table>
+
+???
+- #### Lemmas appearing in multiple cells are associated with multiple parts of speech
+
+
+---
+class: middle
+
+## Coefficients for Author Presumed Male
+
+#### Features: Terms Associated with Positive Sentiment
+
+<div class="table-wrapper">
+  
+  <table border="1" class="dataframe">
+  <thead>
+    <tr>
+      <th>feature</th>
+      <th>feature_averages</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>include</td>
+      <td>-1.77</td>
+    </tr>
+    <tr>
+      <td>sea</td>
+      <td>-1.51</td>
+    </tr>
+    <tr>
+      <td>university</td>
+      <td>-1.42</td>
+    </tr>
+    <tr>
+      <td>present</td>
+      <td>-1.37</td>
+    </tr>
+    <tr>
+      <td>expedition</td>
+      <td>-1.35</td>
+    </tr>
+    <tr>
+      <td>captain</td>
+      <td>-1.19</td>
+    </tr>
+    <tr>
+      <td>hero</td>
+      <td>-1.17</td>
+    </tr>
+    <tr>
+      <td>prove</td>
+      <td>-1.16</td>
+    </tr>
+    <tr>
+      <td>guide</td>
+      <td>-1.16</td>
+    </tr>
+    <tr>
+      <td>fairly</td>
+      <td>-1.14</td>
+    </tr>
+    <tr>
+      <td>scientific</td>
+      <td>-1.13</td>
+    </tr>
+    <tr>
+      <td>important</td>
+      <td>-1.07</td>
+    </tr>
+    <tr>
+      <td>word</td>
+      <td>-1.06</td>
+    </tr>
+    <tr>
+      <td>birth</td>
+      <td>-1.04</td>
+    </tr>
+    <tr>
+      <td>gain</td>
+      <td>-1.03</td>
+    </tr>
+    <tr>
+      <td>knowledge</td>
+      <td>-1.03</td>
+    </tr>
+    <tr>
+      <td>question</td>
+      <td>-1.03</td>
+    </tr>
+    <tr>
+      <td>existence</td>
+      <td>-1.03</td>
+    </tr>
+    <tr>
+      <td>prince</td>
+      <td>-1.01</td>
+    </tr>
+    <tr>
+      <td>occupation</td>
+      <td>-1.00</td>
+    </tr>
+    <tr>
+      <td>rest</td>
+      <td>-0.99</td>
+    </tr>
+    <tr>
+      <td>fair</td>
+      <td>-0.99</td>
+    </tr>
+    <tr>
+      <td>frank</td>
+      <td>-0.97</td>
+    </tr>
+    <tr>
+      <td>revolution</td>
+      <td>-0.97</td>
+    </tr>
+    <tr>
+      <td>succeed</td>
+      <td>-0.96</td>
+    </tr>
+    <tr>
+      <td>doctor</td>
+      <td>-0.96</td>
+    </tr>
+    <tr>
+      <td>labor</td>
+      <td>-0.95</td>
+    </tr>
+    <tr>
+      <td>gold</td>
+      <td>-0.93</td>
+    </tr>
+    <tr>
+      <td>general</td>
+      <td>-0.93</td>
+    </tr>
+    <tr>
+      <td>apt</td>
+      <td>-0.91</td>
+    </tr>
+    <tr>
+      <td>discussion</td>
+      <td>-0.90</td>
+    </tr>
+    <tr>
+      <td>accord</td>
+      <td>-0.88</td>
+    </tr>
+    <tr>
+      <td>discovery</td>
+      <td>-0.87</td>
+    </tr>
+    <tr>
+      <td>scholar</td>
+      <td>-0.87</td>
+    </tr>
+    <tr>
+      <td>missionary</td>
+      <td>-0.86</td>
+    </tr>
+    <tr>
+      <td>classic</td>
+      <td>-0.86</td>
+    </tr>
+    <tr>
+      <td>evolution</td>
+      <td>-0.85</td>
+    </tr>
+    <tr>
+      <td>prophet</td>
+      <td>-0.85</td>
+    </tr>
+    <tr>
+      <td>learn</td>
+      <td>-0.85</td>
+    </tr>
+    <tr>
+      <td>carefully</td>
+      <td>-0.84</td>
+    </tr>
+    <tr>
+      <td>professor</td>
+      <td>-0.84</td>
+    </tr>
+    <tr>
+      <td>found</td>
+      <td>-0.83</td>
+    </tr>
+    <tr>
+      <td>fortune</td>
+      <td>-0.82</td>
+    </tr>
+    <tr>
+      <td>purity</td>
+      <td>-0.80</td>
+    </tr>
+    <tr>
+      <td>partner</td>
+      <td>-0.80</td>
+    </tr>
+    <tr>
+      <td>tree</td>
+      <td>-0.79</td>
+    </tr>
+    <tr>
+      <td>reader</td>
+      <td>-0.78</td>
+    </tr>
+    <tr>
+      <td>generous</td>
+      <td>-0.78</td>
+    </tr>
+    <tr>
+      <td>action</td>
+      <td>-0.76</td>
+    </tr>
+    <tr>
+      <td>guard</td>
+      <td>-0.75</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+---
+class:middle
+
+## Parts of Speech for Author Presumed Male
+
+#### Features: Terms Associated with Positive Sentiment
+
+<table class="term-groups">
+<tbody>
+<tr>
+  <th>Adjectives</th>
+  <td>apt, classic, fair, found, frank, general, generous, gold, important, missionary, present, scientific</td>
+</tr>
+<tr>
+  <th>Adverbs</th>
+  <td>carefully, fair, fairly</td>
+</tr>
+<tr>
+  <th>Nouns</th>
+  <td>accord, action, birth, captain, classic, discovery, discussion, doctor, evolution, existence, expedition, fair, fortune, found, frank, gain, general, gold, guard, guide, hero, knowledge, labor, missionary, occupation, partner, present, prince, professor, prophet, purity, question, reader, rest, revolution, scholar, sea, tree, university, word</td>
+</tr> 
+<tr>
+  <th>Verbs</th>
+  <td>accord, action, birth, captain, doctor, fair, found, frank, gain, general, guard, guide, include, labor, learn, partner, present, prove, question, rest, succeed, tree, word</td>
+</tr>
+</tbody>
+</table>
+
+???
+- #### Lemmas appearing in multiple cells are associated with multiple parts of speech
+
+---
+class: middle
+
+# In Other Words
+
+- ### Praise terms for authors presumed female suggest individualized compliments, many that would seem overtly patronizing today (clever, humble, pleasant, masculine)
+
+- ### Praise terms for authors presumed male suggest canonization and cultural position (classic, important, scientific) 
+
+---
+class: middle
+
+# Focusing on Negative Sentiment Features
+
+---
+class: middle
+
+<h2 class="performance">Model Performance</h2>
+
+<div id="sentiment_neg" class="performance">
+<img class="hist" src=" figures/sentiment_neg_hist.png"/>
+</div>
+
+<h4 class="performance">Features: Terms Associated with Negative Sentiment</h4>
+
+???
+- #### 66% accuracy
+---
+class: middle
+
+## Coefficients for Author Presumed Female
+
+#### Features: Terms Associated with Negative Sentiment
+
+<div class="table-wrapper">
+  <table border="1" class="dataframe">
+  <thead>
+    <tr>
+      <th>feature</th>
+      <th>feature_averages</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>mother</td>
+      <td>2.98</td>
+    </tr>
+    <tr>
+      <td>sin</td>
+      <td>2.07</td>
+    </tr>
+    <tr>
+      <td>mar</td>
+      <td>2.03</td>
+    </tr>
+    <tr>
+      <td>creature</td>
+      <td>1.52</td>
+    </tr>
+    <tr>
+      <td>tragedy</td>
+      <td>1.52</td>
+    </tr>
+    <tr>
+      <td>confess</td>
+      <td>1.47</td>
+    </tr>
+    <tr>
+      <td>wound</td>
+      <td>1.44</td>
+    </tr>
+    <tr>
+      <td>hate</td>
+      <td>1.39</td>
+    </tr>
+    <tr>
+      <td>fade</td>
+      <td>1.36</td>
+    </tr>
+    <tr>
+      <td>errant</td>
+      <td>1.31</td>
+    </tr>
+    <tr>
+      <td>wrong</td>
+      <td>1.29</td>
+    </tr>
+    <tr>
+      <td>mess</td>
+      <td>1.28</td>
+    </tr>
+    <tr>
+      <td>revenge</td>
+      <td>1.26</td>
+    </tr>
+    <tr>
+      <td>unexpected</td>
+      <td>1.25</td>
+    </tr>
+    <tr>
+      <td>abundance</td>
+      <td>1.22</td>
+    </tr>
+    <tr>
+      <td>unconscious</td>
+      <td>1.22</td>
+    </tr>
+    <tr>
+      <td>humble</td>
+      <td>1.20</td>
+    </tr>
+    <tr>
+      <td>bluff</td>
+      <td>1.18</td>
+    </tr>
+    <tr>
+      <td>mutter</td>
+      <td>1.15</td>
+    </tr>
+    <tr>
+      <td>exile</td>
+      <td>1.14</td>
+    </tr>
+    <tr>
+      <td>kill</td>
+      <td>1.12</td>
+    </tr>
+    <tr>
+      <td>elusive</td>
+      <td>1.08</td>
+    </tr>
+    <tr>
+      <td>bad</td>
+      <td>1.07</td>
+    </tr>
+    <tr>
+      <td>dreary</td>
+      <td>1.04</td>
+    </tr>
+    <tr>
+      <td>gross</td>
+      <td>1.03</td>
+    </tr>
+    <tr>
+      <td>barren</td>
+      <td>1.03</td>
+    </tr>
+    <tr>
+      <td>kick</td>
+      <td>1.02</td>
+    </tr>
+    <tr>
+      <td>eviction</td>
+      <td>1.02</td>
+    </tr>
+    <tr>
+      <td>litigation</td>
+      <td>0.99</td>
+    </tr>
+    <tr>
+      <td>terrible</td>
+      <td>0.97</td>
+    </tr>
+    <tr>
+      <td>refusal</td>
+      <td>0.96</td>
+    </tr>
+    <tr>
+      <td>possession</td>
+      <td>0.95</td>
+    </tr>
+    <tr>
+      <td>hurt</td>
+      <td>0.95</td>
+    </tr>
+    <tr>
+      <td>speculation</td>
+      <td>0.95</td>
+    </tr>
+    <tr>
+      <td>leave</td>
+      <td>0.95</td>
+    </tr>
+    <tr>
+      <td>snob</td>
+      <td>0.94</td>
+    </tr>
+    <tr>
+      <td>torture</td>
+      <td>0.93</td>
+    </tr>
+    <tr>
+      <td>stray</td>
+      <td>0.93</td>
+    </tr>
+    <tr>
+      <td>perilous</td>
+      <td>0.92</td>
+    </tr>
+    <tr>
+      <td>flirt</td>
+      <td>0.91</td>
+    </tr>
+    <tr>
+      <td>despair</td>
+      <td>0.89</td>
+    </tr>
+    <tr>
+      <td>tragic</td>
+      <td>0.88</td>
+    </tr>
+    <tr>
+      <td>chatty</td>
+      <td>0.88</td>
+    </tr>
+    <tr>
+      <td>grief</td>
+      <td>0.87</td>
+    </tr>
+    <tr>
+      <td>surrender</td>
+      <td>0.86</td>
+    </tr>
+    <tr>
+      <td>accident</td>
+      <td>0.86</td>
+    </tr>
+    <tr>
+      <td>defy</td>
+      <td>0.86</td>
+    </tr>
+    <tr>
+      <td>bitterness</td>
+      <td>0.85</td>
+    </tr>
+    <tr>
+      <td>ugliness</td>
+      <td>0.85</td>
+    </tr>
+    <tr>
+      <td>suffer</td>
+      <td>0.83</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+---
+class:middle
+
+## Parts of Speech for Author Presumed Female
+
+#### Features: Terms Associated with Negative Sentiment
+
+<table class="term-groups">
+<tbody>
+<tr>
+  <th>Adjectives</th>
+  <td>bad, barren, bluff, chatty, dreary, elusive, errant, gross, humble, hurt, perilous, snob, stray, terrible, tragic, unconscious, unexpected, wound, wrong</td>
+</tr>
+<tr>
+  <th>Adverbs</th>
+  <td>bad, wrong</tr>
+<tr>
+  <th>Nouns</th>
+  <td>abundance, accident, bad, barren, bitterness, bluff, confess, creature, despair, eviction, exile, fade, flirt, grief, gross, hate, hurt, kick, kill, leave, litigation, mar, mess, mother, mutter, possession, refusal, revenge, sin, snob, speculation, stray, surrender, torture, tragedy, ugliness, unconscious, wound, wrong</td>
+</td>
+</tr> 
+<tr>
+  <th>Verbs</th>
+  <td>bluff, confess, defy, despair, exile, fade, flirt, gross, hate, humble, hurt, kick, kill, leave, mar, mess, mother, mutter, revenge, sin, stray, suffer, surrender, torture, wound, wrong</td>
+</tr>
+</tbody>
+</table>
+
+???
+- #### Lemmas appearing in multiple cells are associated with multiple parts of speech
+
+---
+class: middle
+
+## Coefficients for Author Presumed Male
+
+#### Features: Terms Associated with Negative Sentiment
+
+<div class="table-wrapper">
+  <table border="1" class="dataframe">
+  <thead>
+    <tr>
+      <th>feature</th>
+      <th>feature_averages</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>government</td>
+      <td>-1.58</td>
+    </tr>
+    <tr>
+      <td>force</td>
+      <td>-1.51</td>
+    </tr>
+    <tr>
+      <td>critic</td>
+      <td>-1.45</td>
+    </tr>
+    <tr>
+      <td>case</td>
+      <td>-1.36</td>
+    </tr>
+    <tr>
+      <td>ill</td>
+      <td>-1.32</td>
+    </tr>
+    <tr>
+      <td>savage</td>
+      <td>-1.25</td>
+    </tr>
+    <tr>
+      <td>slavery</td>
+      <td>-1.14</td>
+    </tr>
+    <tr>
+      <td>copy</td>
+      <td>-1.14</td>
+    </tr>
+    <tr>
+      <td>late</td>
+      <td>-1.12</td>
+    </tr>
+    <tr>
+      <td>revolution</td>
+      <td>-1.09</td>
+    </tr>
+    <tr>
+      <td>slay</td>
+      <td>-1.09</td>
+    </tr>
+    <tr>
+      <td>battle</td>
+      <td>-1.07</td>
+    </tr>
+    <tr>
+      <td>strike</td>
+      <td>-1.06</td>
+    </tr>
+    <tr>
+      <td>foreign</td>
+      <td>-1.02</td>
+    </tr>
+    <tr>
+      <td>fight</td>
+      <td>-1.00</td>
+    </tr>
+    <tr>
+      <td>treat</td>
+      <td>-1.00</td>
+    </tr>
+    <tr>
+      <td>sentence</td>
+      <td>-0.98</td>
+    </tr>
+    <tr>
+      <td>conflict</td>
+      <td>-0.97</td>
+    </tr>
+    <tr>
+      <td>terror</td>
+      <td>-0.97</td>
+    </tr>
+    <tr>
+      <td>problem</td>
+      <td>-0.96</td>
+    </tr>
+    <tr>
+      <td>refuse</td>
+      <td>-0.95</td>
+    </tr>
+    <tr>
+      <td>peril</td>
+      <td>-0.94</td>
+    </tr>
+    <tr>
+      <td>neglect</td>
+      <td>-0.91</td>
+    </tr>
+    <tr>
+      <td>omit</td>
+      <td>-0.89</td>
+    </tr>
+    <tr>
+      <td>argue</td>
+      <td>-0.86</td>
+    </tr>
+    <tr>
+      <td>lose</td>
+      <td>-0.85</td>
+    </tr>
+    <tr>
+      <td>slave</td>
+      <td>-0.85</td>
+    </tr>
+    <tr>
+      <td>difficulty</td>
+      <td>-0.84</td>
+    </tr>
+    <tr>
+      <td>trick</td>
+      <td>-0.81</td>
+    </tr>
+    <tr>
+      <td>conceal</td>
+      <td>-0.79</td>
+    </tr>
+    <tr>
+      <td>revive</td>
+      <td>-0.79</td>
+    </tr>
+    <tr>
+      <td>trifle</td>
+      <td>-0.79</td>
+    </tr>
+    <tr>
+      <td>prank</td>
+      <td>-0.78</td>
+    </tr>
+    <tr>
+      <td>scotch</td>
+      <td>-0.77</td>
+    </tr>
+    <tr>
+      <td>lawyer</td>
+      <td>-0.76</td>
+    </tr>
+    <tr>
+      <td>inferior</td>
+      <td>-0.76</td>
+    </tr>
+    <tr>
+      <td>prisoner</td>
+      <td>-0.75</td>
+    </tr>
+    <tr>
+      <td>stain</td>
+      <td>-0.74</td>
+    </tr>
+    <tr>
+      <td>ignorance</td>
+      <td>-0.73</td>
+    </tr>
+    <tr>
+      <td>serve</td>
+      <td>-0.73</td>
+    </tr>
+    <tr>
+      <td>blind</td>
+      <td>-0.73</td>
+    </tr>
+    <tr>
+      <td>cross</td>
+      <td>-0.73</td>
+    </tr>
+    <tr>
+      <td>shoot</td>
+      <td>-0.71</td>
+    </tr>
+    <tr>
+      <td>rat</td>
+      <td>-0.71</td>
+    </tr>
+    <tr>
+      <td>argument</td>
+      <td>-0.70</td>
+    </tr>
+    <tr>
+      <td>defect</td>
+      <td>-0.70</td>
+    </tr>
+    <tr>
+      <td>mislead</td>
+      <td>-0.70</td>
+    </tr>
+    <tr>
+      <td>row</td>
+      <td>-0.69</td>
+    </tr>
+    <tr>
+      <td>weary</td>
+      <td>-0.69</td>
+    </tr>
+    <tr>
+      <td>suppress</td>
+      <td>-0.68</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+---
+class:middle
+
+## Parts of Speech for Author Presumed Male
+
+#### Features: Terms Associated with Negative Sentiment
+
+<table class="term-groups">
+<tbody>
+<tr>
+  <th>Adjectives</th>
+  <td>blind, cross, foreign, ill, inferior, late, savage, scotch, weary</td>
+</tr>
+<tr>
+  <th>Adverbs</th>
+  <td>ill, late</tr>
+<tr>
+  <th>Nouns</th>
+  <td>argument, battle, blind, case, conflict, copy, critic, cross, defect, difficulty, fight, force, government, ignorance, ill, inferior, lawyer, neglect, peril, prank, prisoner, problem, rat, refuse, revolution, row, savage, scotch, sentence, serve, shoot, slave, slavery, stain, strike, terror, treat, trick, trifle</td>
+</td>
+</tr> 
+<tr>
+  <th>Verbs</th>
+  <td>argue, battle, blind, case, conceal, conflict, copy, cross, defect, fight, force, lose, mislead, neglect, omit, peril, prank, rat, refuse, revive, row, savage, scotch, sentence, serve, shoot, slave, slay, stain, strike, suppress, treat, trick, trifle, weary</td>
+</tr>
+</tbody>
+</table>
+
+???
+- #### Lemmas appearing in multiple cells are associated with multiple parts of speech
+
+---
+class: middle
+
+# In Other Words
+
+- ### Critical terms for authors presumed female suggest morality topics (grief, hate, sin, terrible, tragic, wound, wrong) and criticism of style (chatty, dreary, elusive, stray) 
+
+- ### Critical terms for authors presumed male suggest government/policy topic (battle, government, lawyer, revolution, savage, slave, slavery) and procedural or stylistic choices (conceal, mislead, neglect, omit, suppress, trifle)
+
+---
+class: middle
+
+# Positive and Negative Sentiment Features Combined
+
+---
+class: middle
+
+<h2 class="performance">Model Performance</h2>
+
+<div id="sentiment_all" class="performance">
+<img class="hist" src=" figures/sentiment_all_hist.png"/>
+</div>
+
+<h4 class="performance">Features: Terms Associated with Positive or Negative Sentiment</h4>
+???
+- #### 74% accuracy
+---
+class: middle
+
+## Coefficients for Author Presumed Female
+
+#### Features: Terms Associated with Positive or Negative Sentiment
+
+<div class="table-wrapper">
+  <table border="1" class="dataframe">
+  <thead>
+    <tr>
+      <th>feature</th>
+      <th>feature_averages</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>garden</td>
+      <td>2.06</td>
+    </tr>
+    <tr>
+      <td>mother</td>
+      <td>2.06</td>
+    </tr>
+    <tr>
+      <td>sculpture</td>
+      <td>1.98</td>
+    </tr>
+    <tr>
+      <td>charm</td>
+      <td>1.66</td>
+    </tr>
+    <tr>
+      <td>daughter</td>
+      <td>1.65</td>
+    </tr>
+    <tr>
+      <td>marriage</td>
+      <td>1.65</td>
+    </tr>
+    <tr>
+      <td>heroine</td>
+      <td>1.59</td>
+    </tr>
+    <tr>
+      <td>visit</td>
+      <td>1.52</td>
+    </tr>
+    <tr>
+      <td>art</td>
+      <td>1.51</td>
+    </tr>
+    <tr>
+      <td>tragedy</td>
+      <td>1.48</td>
+    </tr>
+    <tr>
+      <td>tender</td>
+      <td>1.46</td>
+    </tr>
+    <tr>
+      <td>sin</td>
+      <td>1.42</td>
+    </tr>
+    <tr>
+      <td>brother</td>
+      <td>1.41</td>
+    </tr>
+    <tr>
+      <td>pleasant</td>
+      <td>1.40</td>
+    </tr>
+    <tr>
+      <td>joy</td>
+      <td>1.39</td>
+    </tr>
+    <tr>
+      <td>love</td>
+      <td>1.28</td>
+    </tr>
+    <tr>
+      <td>hardy</td>
+      <td>1.21</td>
+    </tr>
+    <tr>
+      <td>nurse</td>
+      <td>1.19</td>
+    </tr>
+    <tr>
+      <td>music</td>
+      <td>1.09</td>
+    </tr>
+    <tr>
+      <td>correspondence</td>
+      <td>1.09</td>
+    </tr>
+    <tr>
+      <td>kill</td>
+      <td>1.02</td>
+    </tr>
+    <tr>
+      <td>saintly</td>
+      <td>1.01</td>
+    </tr>
+    <tr>
+      <td>breakfast</td>
+      <td>1.00</td>
+    </tr>
+    <tr>
+      <td>marry</td>
+      <td>0.99</td>
+    </tr>
+    <tr>
+      <td>author</td>
+      <td>0.98</td>
+    </tr>
+    <tr>
+      <td>apologize</td>
+      <td>0.98</td>
+    </tr>
+    <tr>
+      <td>mar</td>
+      <td>0.98</td>
+    </tr>
+    <tr>
+      <td>dance</td>
+      <td>0.95</td>
+    </tr>
+    <tr>
+      <td>saint</td>
+      <td>0.94</td>
+    </tr>
+    <tr>
+      <td>masculine</td>
+      <td>0.94</td>
+    </tr>
+    <tr>
+      <td>creature</td>
+      <td>0.93</td>
+    </tr>
+    <tr>
+      <td>clever</td>
+      <td>0.93</td>
+    </tr>
+    <tr>
+      <td>romance</td>
+      <td>0.93</td>
+    </tr>
+    <tr>
+      <td>counsel</td>
+      <td>0.92</td>
+    </tr>
+    <tr>
+      <td>fancy</td>
+      <td>0.92</td>
+    </tr>
+    <tr>
+      <td>cherry</td>
+      <td>0.91</td>
+    </tr>
+    <tr>
+      <td>shine</td>
+      <td>0.89</td>
+    </tr>
+    <tr>
+      <td>dinner</td>
+      <td>0.88</td>
+    </tr>
+    <tr>
+      <td>wound</td>
+      <td>0.87</td>
+    </tr>
+    <tr>
+      <td>salute</td>
+      <td>0.87</td>
+    </tr>
+    <tr>
+      <td>pope</td>
+      <td>0.86</td>
+    </tr>
+    <tr>
+      <td>bridesmaid</td>
+      <td>0.86</td>
+    </tr>
+    <tr>
+      <td>confess</td>
+      <td>0.85</td>
+    </tr>
+    <tr>
+      <td>hate</td>
+      <td>0.84</td>
+    </tr>
+    <tr>
+      <td>caretaker</td>
+      <td>0.82</td>
+    </tr>
+    <tr>
+      <td>wrong</td>
+      <td>0.82</td>
+    </tr>
+    <tr>
+      <td>fade</td>
+      <td>0.81</td>
+    </tr>
+    <tr>
+      <td>revenge</td>
+      <td>0.81</td>
+    </tr>
+    <tr>
+      <td>young</td>
+      <td>0.81</td>
+    </tr>
+    <tr>
+      <td>monk</td>
+      <td>0.79</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+---
+class: middle
+
+## Coefficients for Author Presumed Male
+
+#### Features: Terms Associated with Positive or Negative Sentiment
+
+<div class="table-wrapper">
+  <table border="1" class="dataframe">
+  <thead>
+    <tr>
+      <th>feature</th>
+      <th>feature_averages</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>include</td>
+      <td>-1.45</td>
+    </tr>
+    <tr>
+      <td>sea</td>
+      <td>-1.39</td>
+    </tr>
+    <tr>
+      <td>adventure</td>
+      <td>-1.36</td>
+    </tr>
+    <tr>
+      <td>university</td>
+      <td>-1.27</td>
+    </tr>
+    <tr>
+      <td>case</td>
+      <td>-1.23</td>
+    </tr>
+    <tr>
+      <td>expedition</td>
+      <td>-1.19</td>
+    </tr>
+    <tr>
+      <td>present</td>
+      <td>-1.18</td>
+    </tr>
+    <tr>
+      <td>critic</td>
+      <td>-1.11</td>
+    </tr>
+    <tr>
+      <td>ill</td>
+      <td>-0.97</td>
+    </tr>
+    <tr>
+      <td>important</td>
+      <td>-0.96</td>
+    </tr>
+    <tr>
+      <td>prove</td>
+      <td>-0.95</td>
+    </tr>
+    <tr>
+      <td>guide</td>
+      <td>-0.95</td>
+    </tr>
+    <tr>
+      <td>boy</td>
+      <td>-0.94</td>
+    </tr>
+    <tr>
+      <td>captain</td>
+      <td>-0.93</td>
+    </tr>
+    <tr>
+      <td>scientific</td>
+      <td>-0.93</td>
+    </tr>
+    <tr>
+      <td>knowledge</td>
+      <td>-0.92</td>
+    </tr>
+    <tr>
+      <td>force</td>
+      <td>-0.92</td>
+    </tr>
+    <tr>
+      <td>question</td>
+      <td>-0.89</td>
+    </tr>
+    <tr>
+      <td>late</td>
+      <td>-0.88</td>
+    </tr>
+    <tr>
+      <td>fairly</td>
+      <td>-0.88</td>
+    </tr>
+    <tr>
+      <td>existence</td>
+      <td>-0.86</td>
+    </tr>
+    <tr>
+      <td>word</td>
+      <td>-0.85</td>
+    </tr>
+    <tr>
+      <td>gain</td>
+      <td>-0.85</td>
+    </tr>
+    <tr>
+      <td>discovery</td>
+      <td>-0.84</td>
+    </tr>
+    <tr>
+      <td>doctor</td>
+      <td>-0.83</td>
+    </tr>
+    <tr>
+      <td>john</td>
+      <td>-0.83</td>
+    </tr>
+    <tr>
+      <td>scholar</td>
+      <td>-0.83</td>
+    </tr>
+    <tr>
+      <td>revolution</td>
+      <td>-0.81</td>
+    </tr>
+    <tr>
+      <td>classic</td>
+      <td>-0.81</td>
+    </tr>
+    <tr>
+      <td>savage</td>
+      <td>-0.80</td>
+    </tr>
+    <tr>
+      <td>hero</td>
+      <td>-0.80</td>
+    </tr>
+    <tr>
+      <td>labor</td>
+      <td>-0.79</td>
+    </tr>
+    <tr>
+      <td>lose</td>
+      <td>-0.78</td>
+    </tr>
+    <tr>
+      <td>frank</td>
+      <td>-0.77</td>
+    </tr>
+    <tr>
+      <td>birth</td>
+      <td>-0.76</td>
+    </tr>
+    <tr>
+      <td>tree</td>
+      <td>-0.75</td>
+    </tr>
+    <tr>
+      <td>fortune</td>
+      <td>-0.73</td>
+    </tr>
+    <tr>
+      <td>fair</td>
+      <td>-0.73</td>
+    </tr>
+    <tr>
+      <td>succeed</td>
+      <td>-0.73</td>
+    </tr>
+    <tr>
+      <td>occupation</td>
+      <td>-0.72</td>
+    </tr>
+    <tr>
+      <td>prince</td>
+      <td>-0.72</td>
+    </tr>
+    <tr>
+      <td>evolution</td>
+      <td>-0.72</td>
+    </tr>
+    <tr>
+      <td>professor</td>
+      <td>-0.72</td>
+    </tr>
+    <tr>
+      <td>accord</td>
+      <td>-0.71</td>
+    </tr>
+    <tr>
+      <td>missionary</td>
+      <td>-0.71</td>
+    </tr>
+    <tr>
+      <td>slavery</td>
+      <td>-0.70</td>
+    </tr>
+    <tr>
+      <td>prophet</td>
+      <td>-0.70</td>
+    </tr>
+    <tr>
+      <td>reader</td>
+      <td>-0.69</td>
+    </tr>
+    <tr>
+      <td>carefully</td>
+      <td>-0.69</td>
+    </tr>
+    <tr>
+      <td>found</td>
+      <td>-0.68</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+---
+class: middle
+
+# In Other Words
+
+- ### Combined sentiment analysis shows that praise terms correlate with gender more than condemnation terms
+
+- ### Women's topic terms and praise terms like charm, pleasant, and tender predominate
+
+- ### Men's topic terms and praise terms like important, guide, knowledge, and discovery predominate
+
+
+---
+class: middle
+
+## Conclusions: Returning to Middlebrow
+
+  - ### Reviews reinforce women writing about morality, sentimentality, and sophistication
+  - ### Reviews reinforce men writing about instruction, knowledge centers, and societal change (using political, not moral, vocabulary)
+  - ### If women's writings related to morality topics addresses societal transformation, reviews don't emphasize it
+  - ### Consumerism is either tacit or less gendered than other categories
+ 
+???
+- #### Revisit middlebrow
+- #### This tells us something about how reviews work
+- #### Journalistic style of book review
+- #### They 'police' topical boundaries and evaluate based partly on author's perceived gender 
+
+---
+class: middle
+
+# Works Cited
+
+- #### Bourdieu, Pierre. <em>The Field of Cultural Production: Essays on Art and Literature.</em> Translated by Randal Johnson. New York: Columbia UP, 1993.
+
+- #### Bourdieu, Pierre. <em>The Rules of Art: Genesis and Structure of the Literary Field.</em> Translated by Susan Emanuel. Palo Alto: Stanford UP, 1996.
+
+- #### Hochman, Barbara. <em>Getting at the Author: Reimagining Books and Reading in the Age of American Realism.</em> Amherst: U of Massachusetts P, 2009.
+
+- #### Radway, Janice A. <em>A Feeling for Books: The Book-Of-The-Month Club, Literary Taste, and Middle-Class Desire</em>. Chapel Hill: U of North Carolina P, 1999.
+
+- #### Rubin, Joan Shelley. <em>The Making of Middlebrow Culture</em>em>. Chapel Hill: U of North Carolina P, 1992.
+
+
+
+
+
+    </textarea>
+    <script src="https://remarkjs.com/downloads/remark-latest.min.js">
+    </script>
+    <script>
+      var slideshow = remark.create();
+    </script>
+  </body>
+</html>
